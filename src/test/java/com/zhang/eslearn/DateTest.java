@@ -3,12 +3,13 @@
  */
 package com.zhang.eslearn;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 
@@ -54,9 +55,6 @@ public class DateTest {
         System.out.println(Timestamp.valueOf(localDateTime).getTime());
         
 //        LocalDate.ofInstant(Instant.ofEpochMilli(now), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(8)))
-        System.out.println( getDateStartTime(now, -8) );
-        System.out.println( getDateEndTime(now, -8) );
-        
 //        Instant instant = Instant.ofEpochMilli(now);
 //        ZoneOffset.ofHours(8);
 //        ZoneId zone = ZoneId.ofOffset(prefix, offset)
@@ -66,15 +64,21 @@ public class DateTest {
 //        Instant.ofEpochMilli(now).atOffset(offset)
     }
     
-    private long getDateStartTime(long timestamp, int offset) {
-        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
-        return Timestamp.valueOf(localDateTime).getTime();
-    }
+//    private long getDateStartTime(long timestamp, int offset) {
+//        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
+//        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
+//        return Timestamp.valueOf(localDateTime).getTime();
+//    }
+//    
+//    private long getDateEndTime(long timestamp, int offset) {
+//        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
+//        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
+//        return Timestamp.valueOf(localDateTime).getTime();
+//    }
     
-    private long getDateEndTime(long timestamp, int offset) {
-        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
-        return Timestamp.valueOf(localDateTime).getTime();
+    @Test
+    public void test_33() throws IOException {
+        InetAddress ipAddr = InetAddress.getLoopbackAddress();
+        System.out.println(ipAddr.isReachable(1000 * 2));
     }
 }

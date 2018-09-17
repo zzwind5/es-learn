@@ -6,13 +6,6 @@ package com.zhang.eslearn.service;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +15,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -73,23 +67,32 @@ public class A3ViolationClientServiceImpl {
             
             InternalDateHistogram dateGroup = (InternalDateHistogram)response.getAggregations().get("date");
             dateGroup.getBuckets().forEach( item -> {
-                resList.add( new A3ViolationClientVo(Long.valueOf(item.getKeyAsString()), item.getDocCount()) );
+                System.out.println(item.getKey());
+                System.out.println(item.getKeyAsString());
+                resList.add( new A3ViolationClientVo( ((DateTime)item.getKey()).getMillis(), item.getDocCount()) );
             });
             return resList;
         });
     }
     
     private long getDateStartTime(final long timestamp, final int offset) {
-        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
-        return Timestamp.valueOf(localDateTime).getTime();
+        var oneDate = TimeUnit.DAYS.toMillis(1);
+        var timeOffset = TimeUnit.HOURS.toMillis(offset);
+        System.out.println(timeOffset);
+        System.out.println(timestamp - timestamp%oneDate);
+        
+        return timestamp - timestamp%oneDate - timeOffset;
+                
+//        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
+//        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
+//        return Timestamp.valueOf(localDateTime).getTime();
     }
     
     private long getDateEndTime(final long timestamp, final int offset) {
-//          return getDateStartTime(timestamp, offset) + TimeUnit.DAYS.toMillis(1) -1;
-        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
-        return Timestamp.valueOf(localDateTime).getTime();
+          return getDateStartTime(timestamp, offset) + TimeUnit.DAYS.toMillis(1) -1;
+//        LocalDate localDate = LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.ofOffset("UTC", ZoneOffset.ofHours(offset)));
+//        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
+//        return Timestamp.valueOf(localDateTime).getTime();
     }
 
 }
